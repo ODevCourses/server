@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  avatar     String?  @unique
+  name       String   @unique
+  email      String   @unique
+  isVerefied Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  password   String
+  role       Role     @default(USER)
+
+  courses Course[]
+  rates   Rate[]
+}
+
+model Course {
+  id          Int      @id @default(autoincrement())
+  avatar      String   @unique
+  name        String   @unique
+  description String
+  rate        Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  lessons  Lesson[]
+  author   User     @relation(fields: [authorId], references: [id])
+  authorId Int
+}
+
+model Lesson {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  rate        Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  course   Course @relation(fields: [courseId], references: [id])
+  courseId Int
+
+  comments Comment[]
+}
+
+model Comment {
+  id          Int      @id @default(autoincrement())
+  description String
+  rate        Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  lesson   Lesson @relation(fields: [lessonId], references: [id])
+  lessonId Int
+}
+
+model Rate {
+  createdAt DateTime @default(now())
+
+  score RateScore
+  type  RateType
+
+  author   User @relation(fields: [authorId], references: [id])
+  authorId Int
+
+  @@id([score, type, authorId])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum RateScore {
+  UP
+  DOWN
+}
+
+enum RateType {
+  USER
+  COURSE
+  LESSON
+  COMMENT
+}

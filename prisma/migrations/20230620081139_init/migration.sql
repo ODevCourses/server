@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN     "isVerefied" BOOLEAN NOT NULL DEFAULT false,
+ALTER COLUMN "avatar" DROP NOT NULL;
