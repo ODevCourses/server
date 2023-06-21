@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { IUserCreate } from 'src/dto/user';
+import { IUserCreate, IUserLogIn } from 'src/dto/user';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -21,6 +21,13 @@ export class UserService {
         createdAt: true,
         isVerefied: true,
         role: true,
+      },
+    });
+  }
+  getFullUser(name: string) {
+    return this.user.findUnique({
+      where: {
+        name,
       },
     });
   }
@@ -48,6 +55,26 @@ export class UserService {
         }
       }
       return { msg: e };
+    }
+  }
+
+  logIn(body: IUserLogIn) {
+    return 1;
+  }
+  async deleteUser(user: { name: string; password: string }) {
+    const userData = await this.getFullUser(user.name);
+    if (userData !== null) {
+      if (user.password === userData.password) {
+        return this.user.delete({
+          where: {
+            id: userData.id,
+          },
+        });
+      } else {
+        return { msg: 'Wrong password', code: 403 };
+      }
+    } else {
+      return { msg: "We couldn't find account", code: 404 };
     }
   }
 }
