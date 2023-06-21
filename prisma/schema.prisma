@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-  id         Int      @id @default(autoincrement())
+  id         String      @id @default(uuid())
   avatar     String?  @unique
   name       String   @unique
   email      String   @unique
@@ -22,7 +22,7 @@ model User {
 }
 
 model Course {
-  id          Int      @id @default(autoincrement())
+  id          String      @id @default(uuid())
   avatar      String   @unique
   name        String   @unique
   description String
@@ -31,30 +31,30 @@ model Course {
 
   lessons  Lesson[]
   author   User     @relation(fields: [authorId], references: [id])
-  authorId Int
+  authorId String
 }
 
 model Lesson {
-  id          Int      @id @default(autoincrement())
+  id          String      @id @default(uuid())
   name        String
   description String
   rate        Int      @default(0)
   createdAt   DateTime @default(now())
 
   course   Course @relation(fields: [courseId], references: [id])
-  courseId Int
+  courseId String
 
   comments Comment[]
 }
 
 model Comment {
-  id          Int      @id @default(autoincrement())
+  id          String      @id @default(uuid())
   description String
   rate        Int      @default(0)
   createdAt   DateTime @default(now())
 
   lesson   Lesson @relation(fields: [lessonId], references: [id])
-  lessonId Int
+  lessonId String
 }
 
 model Rate {
@@ -64,7 +64,7 @@ model Rate {
   type  RateType
 
   author   User @relation(fields: [authorId], references: [id])
-  authorId Int
+  authorId String
 
   @@id([score, type, authorId])
 }

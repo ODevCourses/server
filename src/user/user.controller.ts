@@ -1,20 +1,28 @@
-import { Controller, Get, ParseIntPipe, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Res } from '@nestjs/common';
 import { UserService } from './user.service';
-import { z } from 'zod';
+import { Response } from 'express';
 
-const userCreate = z.object({
-  name: z.string(),
-  email: z.string(),
-  password: z.string(),
-});
-
-@Controller('/user')
+@Controller('user')
 export class UserController {
   constructor(private readonly user: UserService) {}
 
-  @Get()
-  getUser(@Query('id', ParseIntPipe) id: number) {
-    z.number().parse(id);
-    return this.user.getUser(id);
+  @Get(':name')
+  getUser(@Param('name') name: string) {
+    return this.user.getUser(name);
+  }
+
+  @Post()
+  async createUser(@Body() body, @Res() res: Response) {
+    const result = await this.user.createUser(body);
+    console.log(result);
+    if ('msg' in result) {
+      res.status(409).json(result);
+    }
+    res.json(result);
+  }
+
+  @Put()
+  updateUser(@Body() body) {
+    return body;
   }
 }
