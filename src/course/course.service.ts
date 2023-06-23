@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { Request } from 'express';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -15,8 +14,15 @@ export class CourseService {
     });
     return res;
   }
-  async createCourse(req: Request) {
-    console.log(req.user);
-    return 1;
+  async createCourse(
+    user,
+    body: { avatar: string; name: string; description: string },
+  ) {
+    return this.course.create({
+      data: {
+        ...body,
+        authorId: user.id,
+      },
+    });
   }
 }

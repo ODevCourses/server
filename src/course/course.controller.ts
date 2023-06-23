@@ -26,7 +26,7 @@ export class CourseController {
 
   @Post()
   async createCourse(@Req() req: Request) {
-    const course = await this.course.createCourse(req);
+    const course = await this.course.createCourse(req.user, req.body);
     return course;
   }
 }
