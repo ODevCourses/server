@@ -1,8 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Body, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { IUserCreate, IUserLogIn } from 'src/dto/user';
+import { env } from 'process';
+import { IUserCreate, IUserLogIn } from 'dto/user';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { v4 as uuidv4 } from 'uuid';
+import token from 'helpers/token.helper';
+const bcrypt = require('bcrypt'); // idk why, but importing doesn't work :(
 
 @Injectable()
 export class UserService {
@@ -24,17 +27,26 @@ export class UserService {
       },
     });
   }
-  getFullUser(name: string) {
-    return this.user.findUnique({
-      where: {
-        name,
-      },
-    });
+  getFullUser(query: string) {
+    if (!query.includes('@')) {
+      return this.user.findUnique({
+        where: {
+          name: query,
+        },
+      });
+    } else {
+      return this.user.findUnique({
+        where: {
+          email: query,
+        },
+      });
+    }
   }
   async createUser(user: IUserCreate) {
     try {
+      const passwd = await bcrypt.hashSync(user.password, env.HASH);
       const res = await this.user.create({
-        data: { id: uuidv4(), ...user },
+        data: { id: uuidv4(), ...user, password: passwd },
         select: {
           id: true,
           avatar: true,
@@ -58,8 +70,14 @@ export class UserService {
     }
   }
 
-  logIn(body: IUserLogIn) {
-    return 1;
+  async logIn(body: IUserLogIn) {
+    const user = await this.getFullUser(body.email);
+    const passwd = await bcrypt.hashSync(body.password, env.HASH);
+    if (user.password === passwd) {
+      return token.generate(user);
+    } else {
+      throw new HttpException('Wrong password', HttpStatus.FORBIDDEN);
+    }
   }
   async deleteUser(user: { name: string; password: string }) {
     const userData = await this.getFullUser(user.name);
@@ -71,9 +89,10 @@ export class UserService {
           },
         });
       } else {
-        return { msg: 'Wrong password', code: 403 };
+        throw new HttpException('Wrong password', HttpStatus.FORBIDDEN);
       }
     } else {
+      throw new HttpException("We couldn't find account", HttpStatus.NOT_FOUND);
       return { msg: "We couldn't find account", code: 404 };
     }
   }

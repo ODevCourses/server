@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -11,7 +13,7 @@ import {
 import { UserService } from './user.service';
 import { Response } from 'express';
 import { User } from '@prisma/client';
-import { IUserLogIn } from 'src/dto/user';
+import { IUserLogIn } from 'dto/user';
 
 @Controller('user')
 export class UserController {
@@ -25,8 +27,13 @@ export class UserController {
   @Post()
   async createUser(@Body() body, @Res() res: Response) {
     const result = await this.user.createUser(body);
+    if (result === undefined)
+      throw new HttpException(
+        'Something wrong',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     if ('msg' in result) {
-      res.status(409).json(result);
+      throw new HttpException(result, HttpStatus.CONFLICT);
     }
     res.json(result);
   }
