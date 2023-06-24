@@ -11,9 +11,12 @@ import { CourseMiddleware } from './course.middleware';
   controllers: [CourseController],
 })
 export class CourseModule {
-  configure(consumer: MiddlewareConsumer) {
+  configuration(consumer: MiddlewareConsumer) {
     consumer
       .apply(AuthMiddleware, CourseMiddleware)
       .forRoutes({ path: 'course', method: RequestMethod.POST });
+    consumer
+      .apply(AuthMiddleware)
+      .forRoutes({ path: 'course', method: RequestMethod.DELETE });
   }
 }

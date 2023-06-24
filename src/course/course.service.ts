@@ -25,4 +25,11 @@ export class CourseService {
       },
     });
   }
+  async deleteCourse(id: string) {
+    return this.course.delete({
+      where: {
+        id,
+      },
+    });
+  }
 }

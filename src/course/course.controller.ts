@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
@@ -28,5 +29,10 @@ export class CourseController {
   async createCourse(@Req() req: Request) {
     const course = await this.course.createCourse(req.user, req.body);
     return course;
+  }
+
+  @Delete()
+  async deleteCourse(@Body('id') id: string) {
+    return this.course.deleteCourse(id);
   }
 }
