@@ -8,10 +8,14 @@ import { CourseController } from './course/course.controller';
 import { CourseService } from './course/course.service';
 import { CourseModule } from './course/course.module';
 import { LessonModule } from './lesson/lesson.module';
+import { CommentModule } from './comment/comment.module';
+import { RateController } from './rate/rate.controller';
+import { RateService } from './rate/rate.service';
+import { RateModule } from './rate/rate.module';
 
 @Module({
-  imports: [PrismaModule, UserModule, CourseModule, LessonModule],
-  controllers: [AppController, CourseController],
-  providers: [AppService, PrismaService, CourseService],
+  imports: [PrismaModule, UserModule, CourseModule, LessonModule, CommentModule, RateModule],
+  controllers: [AppController, CourseController, RateController],
+  providers: [AppService, PrismaService, CourseService, RateService],
 })
 export class AppModule {}

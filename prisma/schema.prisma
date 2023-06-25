@@ -20,6 +20,7 @@ model User {
   courses Course[]
   lessons Lesson[]
   rates   Rate[]
+  comment Comment[]
 }
 
 model Course {
@@ -59,18 +60,22 @@ model Comment {
 
   lesson   Lesson @relation(fields: [lessonId], references: [id])
   lessonId String
+
+  author User @relation(fields: [authorId], references: [id])
+  authorId String
 }
 
 model Rate {
   createdAt DateTime @default(now())
 
+  id String
   score RateScore
   type  RateType
 
   author   User   @relation(fields: [authorId], references: [id])
   authorId String
 
-  @@id([score, type, authorId])
+  @@id([score, type, authorId, id])
 }
 
 enum Role {
